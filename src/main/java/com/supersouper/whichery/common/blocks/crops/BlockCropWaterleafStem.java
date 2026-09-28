@@ -18,6 +18,9 @@ import net.minecraft.world.World;
 import com.supersouper.whichery.ModBlocks;
 import com.supersouper.whichery.ModItems;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 public class BlockCropWaterleafStem extends BlockBush implements IGrowable {
 
     // Offsets to check horizontally to spread water
@@ -172,5 +175,20 @@ public class BlockCropWaterleafStem extends BlockBush implements IGrowable {
     @Override
     public void func_149853_b(World world, Random random, int x, int y, int z) {
         growTop(world, x, y, z);
+    }
+
+    // Because the stem is underwater, the part of the stem that connects into the main crop is much darker
+    // than the crop. To avoid this, we take the brighter of this block or the block above.
+    // Compares both sky & block light.
+    @Override
+    @SideOnly(Side.CLIENT)
+    public int getMixedBrightnessForBlock(IBlockAccess world, int x, int y, int z) {
+        int here = world.getLightBrightnessForSkyBlocks(x, y, z, 0);
+        int above = world.getLightBrightnessForSkyBlocks(x, y + 1, z, 0);
+        int hereBlock = here & 255;
+        int aboveBlock = above & 255;
+        int hereSky = here >> 16 & 255;
+        int aboveSky = above >> 16 & 255;
+        return Math.max(hereBlock, aboveBlock) | Math.max(hereSky, aboveSky) << 16;
     }
 }
