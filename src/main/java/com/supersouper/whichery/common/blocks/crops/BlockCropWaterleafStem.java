@@ -36,6 +36,7 @@ public class BlockCropWaterleafStem extends BlockBush implements IGrowable {
         setBlockName("crop_waterleaf_stem");
         setBlockTextureName("whichery:crops/waterleaf/stem");
         setLightOpacity(Blocks.water.getLightOpacity());
+        setBlockBounds(0.3f, 0.0f, 0.3f, 0.7f, 1.0f, 0.7f);
         setStepSound(soundTypeGrass);
         // Add a little bit of hardness to the stem so you don't accidentally break it when harvesting the top.
         setHardness(0.5f);
