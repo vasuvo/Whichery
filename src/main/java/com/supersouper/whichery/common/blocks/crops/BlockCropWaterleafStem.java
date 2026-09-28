@@ -27,7 +27,11 @@ public class BlockCropWaterleafStem extends BlockBush implements IGrowable {
     private static final int[][] OFFSETS = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
     // Since the stem mimics some properties of water,
     // the metadata must be 8-15 to avoid overlapping with 0 (bucketable water) or 1-7 (non-full water).
-    public static final int METADATA = 8;
+    public static final int METADATA_BASE = 8;
+    // The max amount of nutrients a waterleaf can store (which greenteeth takes from). Metadata caps this at 7.
+    public static final int MAX_NUTRIENTS = 4;
+    // The chance every random tick that waterleaf regains a nutrient. 1 in X.
+    public static final int NUTRIENT_REGROWTH_CHANCE = 4;
 
     public static int renderID = 1;
 
@@ -158,6 +162,23 @@ public class BlockCropWaterleafStem extends BlockBush implements IGrowable {
         }
         // Regrow the crop above if there is free space
         growTop(world, x, y, z);
+
+        // Chance to regain lost nutrients
+        int meta = world.getBlockMetadata(x, y, z);
+        if (meta < METADATA_BASE + MAX_NUTRIENTS && random.nextInt(NUTRIENT_REGROWTH_CHANCE) == 0) {
+            world.setBlockMetadataWithNotify(x, y, z, meta + 1, 2);
+        }
+    }
+
+    // Tries to spend a nutrient from a stem.
+    // Returns true if a nutrient was successfully spent.
+    public static boolean trySpendNutrient(World world, int x, int y, int z) {
+        int meta = world.getBlockMetadata(x, y, z);
+        if (world.getBlock(x, y, z) == ModBlocks.WATERLEAF_STEM.get() && meta > METADATA_BASE) {
+            world.setBlockMetadataWithNotify(x, y, z, meta - 1, 2);
+            return true;
+        }
+        return false;
     }
 
     // Can bone meal if block above stem is air
@@ -173,6 +194,7 @@ public class BlockCropWaterleafStem extends BlockBush implements IGrowable {
     }
 
     // Bone meal places crop above
+    // Intentionally does not return nutrients to the stem, to make infinite greenteeth harder
     @Override
     public void func_149853_b(World world, Random random, int x, int y, int z) {
         growTop(world, x, y, z);
@@ -191,5 +213,14 @@ public class BlockCropWaterleafStem extends BlockBush implements IGrowable {
         int hereSky = here >> 16 & 255;
         int aboveSky = above >> 16 & 255;
         return Math.max(hereBlock, aboveBlock) | Math.max(hereSky, aboveSky) << 16;
+    }
+
+    // Helper functions to let other classes access nutrient data.
+    public static int getNutrients(int meta) {
+        return meta - METADATA_BASE;
+    }
+
+    public static int toMeta(int nutrients) {
+        return nutrients + METADATA_BASE;
     }
 }

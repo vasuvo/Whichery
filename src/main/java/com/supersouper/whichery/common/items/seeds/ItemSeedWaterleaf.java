@@ -1,8 +1,8 @@
 package com.supersouper.whichery.common.items.seeds;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -38,8 +38,15 @@ public class ItemSeedWaterleaf extends ItemWhicherySeed {
             return false;
         }
         // Check that there is a 1-block-deep water source
-        if (water == Blocks.water && world.getBlockMetadata(tx, ty, tz) == 0 && world.isAirBlock(tx, ty + 1, tz)) {
-            world.setBlock(tx, ty, tz, getCropBlock(), BlockCropWaterleafStem.METADATA, 3);
+        if (water.getMaterial() == Material.water && world.getBlockMetadata(tx, ty, tz) == 0
+            && world.isAirBlock(tx, ty + 1, tz)) {
+            world.setBlock(
+                tx,
+                ty,
+                tz,
+                getCropBlock(),
+                BlockCropWaterleafStem.toMeta(BlockCropWaterleafStem.MAX_NUTRIENTS),
+                3);
             ((BlockCropWaterleafStem) getCropBlock()).growTop(world, tx, ty, tz);
             if (!player.capabilities.isCreativeMode) {
                 stack.stackSize--;
