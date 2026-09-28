@@ -5,17 +5,23 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
+import net.minecraft.block.IGrowable;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import com.supersouper.whichery.ModBlocks;
 import com.supersouper.whichery.ModItems;
 
-public class BlockCropGreenteeth extends BlockBush {
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+public class BlockCropGreenteeth extends BlockBush implements IGrowable {
 
     // Below are two limits that define how greenteeth spreads. The per-block values are stored in the metadata.
     // The limits must be set such that (MAX_DISTANCE * (MAX_SPREADS + 1) + MAX_SPREADS ) < 16.
@@ -29,9 +35,13 @@ public class BlockCropGreenteeth extends BlockBush {
     public static final int MAX_SPREADS = 4;
     private static final int[][] OFFSETS = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
 
+    @SideOnly(Side.CLIENT)
+    private IIcon sparseIcon;
+    @SideOnly(Side.CLIENT)
+    private IIcon solidIcon;
+
     public BlockCropGreenteeth() {
         setBlockName("crop_greenteeth");
-        setBlockTextureName("whichery:crops/greenteeth/living");
         setStepSound(soundTypeGrass);
         setBlockBounds(0, 0, 0, 1, 0.015625f, 1);
     }
@@ -49,28 +59,21 @@ public class BlockCropGreenteeth extends BlockBush {
         return ground == Blocks.water;
     }
 
-    // TEMP DEV FUNCTION: Remove before PR
-    // Right click on greenteeth mimics random ticks.
-    @Override
-    public boolean onBlockActivated(World worldIn, int x, int y, int z, EntityPlayer player, int side, float subX,
-        float subY, float subZ) {
-        if (!worldIn.isRemote) {
-            updateTick(worldIn, x, y, z, worldIn.rand);
-        }
-        return true;
-    }
-
     @Override
     public void updateTick(World world, int x, int y, int z, Random random) {
         super.updateTick(world, x, y, z, random);
         if (world.getBlock(x, y, z) != this) {
             return;
         }
+        tryGrow(world, x, y, z, random);
+    }
 
+    // Tries to grow into a free neighboring block. Returns true if it successfully grew.
+    private boolean tryGrow(World world, int x, int y, int z, Random random) {
         int meta = world.getBlockMetadata(x, y, z);
         // If the greenteeth can't grow, stop
         if (!canGrow(meta)) {
-            return;
+            return false;
         }
         int distance = getDistance(meta);
         int spread = getSpread(meta);
@@ -93,7 +96,28 @@ public class BlockCropGreenteeth extends BlockBush {
             world.setBlock(x + offset[0], y, z + offset[1], this, toMeta(0, hasNutrients ? 0 : distance + 1), 3);
             // Update this block's spread count
             world.setBlockMetadataWithNotify(x, y, z, toMeta(spread + 1, distance), 2);
+            return true;
         }
+        return false;
+    }
+
+    // Can bone meal be used on this block? If false, the bone meal isn't used up.
+    @Override
+    public boolean func_149851_a(World world, int x, int y, int z, boolean isClient) {
+        return canGrow(world.getBlockMetadata(x, y, z));
+    }
+
+    // Bone meal always succeeds
+    @Override
+    public boolean func_149852_a(World world, Random random, int x, int y, int z) {
+        return true;
+    }
+
+    // Bone meal effect
+    @Override
+    public void func_149853_b(World world, Random random, int x, int y, int z) {
+        tryGrow(world, x, y, z, random);
+        tryGrow(world, x, y, z, random);
     }
 
     // Checks for nutrients around a new greenteeth. Returns true if nutrients were found & taken.
@@ -124,7 +148,41 @@ public class BlockCropGreenteeth extends BlockBush {
 
     @Override
     public int getRenderType() {
-        return 23;
+        return 0;
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void registerBlockIcons(IIconRegister reg) {
+        solidIcon = reg.registerIcon("whichery:crops/greenteeth/solid");
+        sparseIcon = reg.registerIcon("whichery:crops/greenteeth/sparse");
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public IIcon getIcon(int side, int meta) {
+        return getSpread(meta) < MAX_SPREADS ? sparseIcon : solidIcon;
+    }
+
+    // Mimics grass by matching biome color.
+    @SideOnly(Side.CLIENT)
+    @Override
+    public int colorMultiplier(IBlockAccess world, int x, int y, int z) {
+        int rSum = 0;
+        int gSum = 0;
+        int bSum = 0;
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                // Average color over a 3x3
+                int color = world.getBiomeGenForCoords(x + dx, z + dz)
+                    .getBiomeGrassColor(x + dx, y, z + dz);
+                rSum += color >> 16 & 255;
+                gSum += color >> 8 & 255;
+                bSum += color & 255;
+            }
+        }
+        // Re-combine RGB
+        return rSum / 9 << 16 | gSum / 9 << 8 | bSum / 9;
     }
 
     // Get distance level

@@ -32,7 +32,7 @@ tooltip.family.death=§8Death§r %s
 tooltip.family.spirit=§bSpirit§r %s
 tooltip.family.hell=§6Hell§r %s
 tooltip.family.potency=(Potency: %s)
-tooltip.greenteeth.plant=§7Consumes %s greenteeth to plant a new growth
+tooltip.greenteeth.plant=§7Uses %s greenteeth to plant
 
 ### Entities
 entity.whichery.MandrakeRoot.name=Mandrake Root
