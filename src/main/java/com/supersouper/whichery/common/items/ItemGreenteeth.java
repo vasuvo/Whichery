@@ -32,7 +32,6 @@ public class ItemGreenteeth extends Item {
     @SideOnly(Side.CLIENT)
     @Override
     public void addInformation(ItemStack itemStack, EntityPlayer player, List<String> toolTip, boolean advTooltips) {
-        // "Consumes X greenteeth to plant a new growth"
         String line = StatCollector.translateToLocalFormatted("tooltip.greenteeth.plant", PLANT_COST);
         toolTip.add(line);
     }
