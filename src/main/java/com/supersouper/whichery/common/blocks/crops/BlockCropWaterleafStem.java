@@ -9,6 +9,7 @@ import net.minecraft.block.IGrowable;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
@@ -21,6 +22,9 @@ public class BlockCropWaterleafStem extends BlockBush implements IGrowable {
 
     // Offsets to check horizontally to spread water
     private static final int[][] OFFSETS = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
+    // Since the stem mimics some properties of water,
+    // the metadata must be 8-15 to avoid overlapping with 0 (bucketable water) or 1-7 (non-full water).
+    public static final int METADATA = 8;
 
     public static int renderID = 1;
 
@@ -59,6 +63,12 @@ public class BlockCropWaterleafStem extends BlockBush implements IGrowable {
         }
     }
 
+    // Returns the seed for pick-block.
+    @Override
+    public Item getItem(World worldIn, int x, int y, int z) {
+        return ModItems.WATERLEAF_SEED.get();
+    }
+
     // Check if the block below is valid (blocks found in riverbeds).
     @Override
     public boolean canPlaceBlockOn(Block ground) {
@@ -77,13 +87,14 @@ public class BlockCropWaterleafStem extends BlockBush implements IGrowable {
         }
     }
 
-    // Cannot put a block in its place like water.
+    // Unlike normal water, you can't place a block here.
     @Override
     public boolean isReplaceable(IBlockAccess world, int x, int y, int z) {
         return false;
     }
 
-    // Replace with water source when broken.
+    // Replace with water source when broken. Uses the 5-argument version that both client and server run
+    // to avoid visual bugs.
     @Override
     public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z) {
         return world.setBlock(x, y, z, Blocks.water, 0, 3);

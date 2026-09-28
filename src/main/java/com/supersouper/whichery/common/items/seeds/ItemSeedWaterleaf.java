@@ -39,7 +39,7 @@ public class ItemSeedWaterleaf extends ItemWhicherySeed {
         }
         // Check that there is a 1-block-deep water source
         if (water == Blocks.water && world.getBlockMetadata(tx, ty, tz) == 0 && world.isAirBlock(tx, ty + 1, tz)) {
-            world.setBlock(tx, ty, tz, getCropBlock(), 8, 3);
+            world.setBlock(tx, ty, tz, getCropBlock(), BlockCropWaterleafStem.METADATA, 3);
             ((BlockCropWaterleafStem) getCropBlock()).growTop(world, tx, ty, tz);
             if (!player.capabilities.isCreativeMode) {
                 stack.stackSize--;

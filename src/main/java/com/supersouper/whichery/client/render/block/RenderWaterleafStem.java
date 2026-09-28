@@ -8,6 +8,7 @@ import net.minecraftforge.client.ForgeHooksClient;
 
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 
+// Handles rendering of the Waterleaf stem, which must render the water's surface in addition to the crop.
 public class RenderWaterleafStem implements ISimpleBlockRenderingHandler {
 
     private final int modelID;
@@ -21,6 +22,7 @@ public class RenderWaterleafStem implements ISimpleBlockRenderingHandler {
 
     }
 
+    // Returns the crop renderer on pass 0, and the water renderer on pass 1.
     @Override
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int id,
         RenderBlocks renderer) {
