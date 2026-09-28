@@ -109,5 +109,9 @@ public final class FamilyRegistry {
             new IngredientFamily.FamilyStack(HELL, 2));
         registerIngredient(ModItems.WITCH_PETAL.newItemStack(), new IngredientFamily.FamilyStack(DEATH, 2));
         registerIngredient(ModItems.WATERLEAF_SEED.newItemStack(), new IngredientFamily.FamilyStack(WATER, 2));
+        registerIngredient(
+            ModItems.GREENTEETH.newItemStack(),
+            new IngredientFamily.FamilyStack(WATER, 1),
+            new IngredientFamily.FamilyStack(DEATH, 1));
     }
 }

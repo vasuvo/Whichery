@@ -8,9 +8,12 @@ import net.minecraft.block.BlockBush;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
 import com.supersouper.whichery.ModBlocks;
+import com.supersouper.whichery.ModItems;
 
 public class BlockCropGreenteeth extends BlockBush {
 
@@ -103,6 +106,20 @@ public class BlockCropGreenteeth extends BlockBush {
             }
         }
         return false;
+    }
+
+    // Every block drops one Greenteeth, alive or dead.
+    @Override
+    public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
+        ArrayList<ItemStack> drops = new ArrayList<>();
+        drops.add(ModItems.GREENTEETH.newItemStack(1));
+        return drops;
+    }
+
+    // Returns the Greenteeth item for pick-block.
+    @Override
+    public Item getItem(World world, int x, int y, int z) {
+        return ModItems.GREENTEETH.get();
     }
 
     @Override
