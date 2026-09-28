@@ -6,6 +6,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
 import com.supersouper.whichery.common.blocks.BlockChalk;
+import com.supersouper.whichery.common.blocks.crops.BlockCropGreenteeth;
 import com.supersouper.whichery.common.blocks.crops.BlockCropMandrake;
 import com.supersouper.whichery.common.blocks.crops.BlockCropWaterleaf;
 import com.supersouper.whichery.common.blocks.crops.BlockCropWaterleafStem;
@@ -23,6 +24,7 @@ public enum ModBlocks {
     MANDRAKE(true, new BlockCropMandrake("mandrake", 3), "crop_mandrake"),
     WATERLEAF(true, new BlockCropWaterleaf("waterleaf", 4), null, "crop_waterleaf"),
     WATERLEAF_STEM(true, new BlockCropWaterleafStem(), null, "crop_waterleaf_stem"),
+    GREENTEETH(true, new BlockCropGreenteeth(), null, "crop_greenteeth"),
 
     ; // leave trailing semicolon
     // spotless:on
