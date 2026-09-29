@@ -117,5 +117,9 @@ public final class FamilyRegistry {
             ModItems.HENBANE_FLOWER.newItemStack(),
             new IngredientFamily.FamilyStack(DEATH, 1),
             new IngredientFamily.FamilyStack(SPIRIT, 1));
+        registerIngredient(
+            ModItems.ST_JOHNS_WORT_FLOWER.newItemStack(),
+            new IngredientFamily.FamilyStack(FIRE, 1),
+            new IngredientFamily.FamilyStack(LIFE, 1));
     }
 }
