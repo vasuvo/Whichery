@@ -112,5 +112,6 @@ public final class FamilyRegistry {
             ModItems.DEVILS_TRUMPET_FLOWER.newItemStack(),
             new IngredientFamily.FamilyStack(HELL, 1),
             new IngredientFamily.FamilyStack(AIR, 1));
+        registerIngredient(ModItems.MULLEIN_WICK.newItemStack(), new IngredientFamily.FamilyStack(FIRE, 2));
     }
 }
