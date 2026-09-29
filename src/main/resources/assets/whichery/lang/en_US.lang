@@ -8,12 +8,27 @@ whichery.key.vampire_bite=Vampire - Bite
 #### Blocks
 tile.crop_witches_thimble.name=Witches' Thimble
 tile.crop_mandrake.name=Mandrake
+tile.crop_devils_trumpet.name=Devil's Trumpet
+tile.crop_henbane.name=Henbane
+tile.crop_mullein.name=Mullein
+tile.crop_lunaria.name=Lunaria
+tile.crop_st_johns_wort.name=St. John's Wort
 
 #### Items
 item.seed_witches_thimble.name=Witches' Thimble Seeds
 item.witch_petal.name=Witchpetal
 item.seed_mandrake.name=Mandrake Seeds
 item.mandrake_root.name=Mandrake Root
+item.seed_devils_trumpet.name=Devil's Trumpet Seeds
+item.devils_trumpet.name=Devil's Trumpet
+item.seed_henbane.name=Henbane Seeds
+item.henbane.name=Henbane
+item.seed_mullein.name=Mullein Seeds
+item.mullein_wick.name=Mullein Wick
+item.lunaria_pod.name=Lunaria Pod
+item.lunaria_bloom.name=Lunaria Bloom
+item.seed_st_johns_wort.name=St. John's Wort Seeds
+item.st_johns_wort.name=St. John's Wort
 item.raw_chicken_that_makes_you_become_a_vampire.name=Raw Chicken that Makes you Become a Vampire
 
 #### Tooltip
