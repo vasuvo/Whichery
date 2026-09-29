@@ -8,9 +8,9 @@ public class ItemSeedLunaria extends ItemWhicherySeed {
 
     public ItemSeedLunaria() {
         super("lunaria");
-        // Lunaria's seed is its pod, which is also used as an ingredient
-        setUnlocalizedName("lunaria_pod");
-        setTextureName("whichery:lunaria_pod");
+        // Lunaria's seed is its seed pod, which is also used as an ingredient
+        setUnlocalizedName("lunaria_seed_pod");
+        setTextureName("whichery:lunaria_seed_pod");
     }
 
     @Override

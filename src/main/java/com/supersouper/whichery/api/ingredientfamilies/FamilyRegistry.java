@@ -121,5 +121,10 @@ public final class FamilyRegistry {
             ModItems.ST_JOHNS_WORT_FLOWER.newItemStack(),
             new IngredientFamily.FamilyStack(FIRE, 1),
             new IngredientFamily.FamilyStack(LIFE, 1));
+        registerIngredient(
+            ModItems.LUNARIA_SEED_POD.newItemStack(),
+            new IngredientFamily.FamilyStack(EARTH, 1),
+            new IngredientFamily.FamilyStack(SPIRIT, 1));
+        registerIngredient(ModItems.LUNARIA_BLOOM.newItemStack(), new IngredientFamily.FamilyStack(SPIRIT, 2));
     }
 }

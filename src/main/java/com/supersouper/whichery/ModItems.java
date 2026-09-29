@@ -31,7 +31,7 @@ public enum ModItems {
     HENBANE_FLOWER(true, new Item().setTextureName("whichery:henbane").setUnlocalizedName("henbane"), "henbane"),
     MULLEIN_SEED(true, new ItemSeedMullein(), "seed_mullein"),
     MULLEIN_WICK(true, new Item().setTextureName("whichery:mullein_wick").setUnlocalizedName("mullein_wick"), "mullein_wick"),
-    LUNARIA_POD(true, new ItemSeedLunaria(), "lunaria_pod"),
+    LUNARIA_SEED_POD(true, new ItemSeedLunaria(), "lunaria_seed_pod"),
     LUNARIA_BLOOM(true, new Item().setTextureName("whichery:lunaria_bloom").setUnlocalizedName("lunaria_bloom"), "lunaria_bloom"),
     ST_JOHNS_WORT_SEED(true, new ItemSeedStJohnsWort(), "seed_st_johns_wort"),
     ST_JOHNS_WORT_FLOWER(true, new Item().setTextureName("whichery:st_johns_wort").setUnlocalizedName("st_johns_wort"), "st_johns_wort"),
