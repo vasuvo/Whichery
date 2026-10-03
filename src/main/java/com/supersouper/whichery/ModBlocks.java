@@ -24,7 +24,7 @@ public enum ModBlocks {
     CHALK_BLOCK(true, new BlockChalk(), "chalk_block"),
     WITCHES_THIMBLE(true, new BlockCropWitchesThimble("witches_thimble", 4), "crop_witches_thimble"),
     MANDRAKE(true, new BlockCropMandrake("mandrake", 3), "crop_mandrake"),
-    DEVILS_TRUMPET(true, new BlockCropDevilsTrumpet("devils_trumpet", 4), null, "crop_devils_trumpet"),
+    DEVILS_TRUMPET(true, new BlockCropDevilsTrumpet(), null, "crop_devils_trumpet"),
     HENBANE(true, new BlockCropHenbane("henbane", 4), null, "crop_henbane"),
     MULLEIN(true, new BlockCropMullein("mullein", 4), null, "crop_mullein"),
     LUNARIA(true, new BlockCropLunaria("lunaria", 4), null, "crop_lunaria"),
