@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
@@ -23,6 +24,8 @@ public class BlockCropStJohnsWort extends BlockWhicheryCrop {
     private static final int NOON = 6000;
     // How much closer to noon each extra flower needs (3 flowers within 2000 of noon, 2 within 4000)
     private static final int NOON_STEP = 2000;
+    // Offsets for the four side neighbors it can spread to
+    private static final int[][] OFFSETS = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
 
     @SideOnly(Side.CLIENT)
     private IIcon bloomIcon;
@@ -57,11 +60,35 @@ public class BlockCropStJohnsWort extends BlockWhicheryCrop {
         int meta = world.getBlockMetadata(x, y, z);
         if (meta >= maxStage) {
             boolean sunlit = isSunlit(world, x, y, z);
-            if (sunlit && meta != bloomMeta()) {
-                world.setBlockMetadataWithNotify(x, y, z, bloomMeta(), 2);
+            if (sunlit) {
+                if (meta != bloomMeta()) {
+                    world.setBlockMetadataWithNotify(x, y, z, bloomMeta(), 2);
+                }
+                // 1 in 4 chance to spread to a random side neighbor
+                if (rand.nextInt(4) == 0) {
+                    trySpread(world, x, y, z, rand);
+                }
             } else if (!sunlit && meta == bloomMeta()) {
                 world.setBlockMetadataWithNotify(x, y, z, maxStage, 2);
             }
+        }
+    }
+
+    /**
+     * Helper function; plants a new St John's Wort on one random side neighbor, if it's empty farmland that can see the
+     * sky.
+     */
+    private void trySpread(World world, int x, int y, int z, Random rand) {
+        int[] offset = OFFSETS[rand.nextInt(OFFSETS.length)];
+        int nx = x + offset[0];
+        int nz = z + offset[1];
+
+        // Don't load a neighboring chunk just to spread into it
+        if (!world.blockExists(nx, y, nz)) return;
+
+        if (world.isAirBlock(nx, y, nz) && world.getBlock(nx, y - 1, nz) == Blocks.farmland
+            && world.canBlockSeeTheSky(nx, y, nz)) {
+            world.setBlock(nx, y, nz, this, 0, 2);
         }
     }
 
@@ -79,6 +106,15 @@ public class BlockCropStJohnsWort extends BlockWhicheryCrop {
     @Override
     protected boolean canFertilize(World world, Random random, int x, int y, int z) {
         return super.canFertilize(world, random, x, y, z) && random.nextInt(2) == 0;
+    }
+
+    /**
+     * Returns no seeds.
+     */
+    @Override
+    public void addDropsAlways(World world, int x, int y, int z, int metadata, int fortune,
+        ArrayList<ItemStack> drops) {
+        return;
     }
 
     /**

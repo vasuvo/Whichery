@@ -32,6 +32,14 @@ public class BlockCropHenbane extends BlockWhicheryCrop {
         return ModItems.HENBANE_SEED.get();
     }
 
+    /**
+     * Renders like vanilla crops (a # shape) instead of a cross.
+     */
+    @Override
+    public int getRenderType() {
+        return 6;
+    }
+
     // Extra form of a blooming henbane, stored above the growth stages
     private int bloomMeta() {
         return maxStage + 1;

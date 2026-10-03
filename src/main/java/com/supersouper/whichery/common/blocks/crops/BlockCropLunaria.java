@@ -35,6 +35,14 @@ public class BlockCropLunaria extends BlockWhicheryCrop {
         return ModItems.LUNARIA_SEED_POD.get();
     }
 
+    /**
+     * Renders like vanilla crops (a # shape) instead of a cross.
+     */
+    @Override
+    public int getRenderType() {
+        return 6;
+    }
+
     // Extra forms of a fully grown lunaria, stored above the growth stages
     private int podsMeta() {
         return maxStage + 1;
