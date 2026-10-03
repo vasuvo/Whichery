@@ -31,12 +31,11 @@ public class BlockCropDevilsTrumpet extends BlockBush implements IGrowable {
 
     // How close an active Nether portal has to be for devil's trumpet to grow (it must "hear hell's passage").
     private static final int PORTAL_RANGE_HORIZONTAL = 4;
-    private static final int PORTAL_RANGE_VERTICAL = 2;
+    private static final int PORTAL_RANGE_VERTICAL = 3;
     // The most blocks a column can hang down
     public static final int MAX_LENGTH = 3;
 
     // Metadata: stems hold the column up; the lowest block is always a bud, a mature bud, or a flower.
-    // A bud grows the column down until it is full, then matures; a mature bud opens into a flower at night.
     public static final int META_STEM = 0;
     public static final int META_BUD = 1;
     public static final int META_BUD_MATURE = 2;
@@ -60,16 +59,13 @@ public class BlockCropDevilsTrumpet extends BlockBush implements IGrowable {
     }
 
     /**
-     * Hangs from a devil's trumpet or a block with a solid underside.
+     * Hangs from a devil's trumpet stem or a block with a solid underside.
      */
     @Override
     public boolean canBlockStay(World world, int x, int y, int z) {
         return world.getBlock(x, y + 1, z) == this || world.isSideSolid(x, y + 1, z, ForgeDirection.DOWN);
     }
 
-    /**
-     * Drops if unsupported. Uses setBlockToAir (flag 3) so the blocks below are told, and fall too.
-     */
     @Override
     protected void checkAndDropBlock(World world, int x, int y, int z) {
         if (!canBlockStay(world, x, y, z)) {
@@ -91,8 +87,8 @@ public class BlockCropDevilsTrumpet extends BlockBush implements IGrowable {
     }
 
     /**
-     * Near a portal, a bud grows the column down, or matures once it can't. A mature bud opens into a flower at
-     * night, and the flower closes again by day.
+     * Near a portal, a bud matures, and a mature bud grows the column down. Once the column can't grow, a mature bud
+     * opens into a flower at night, and the flower closes again by day.
      */
     @Override
     public void updateTick(World world, int x, int y, int z, Random random) {
@@ -100,7 +96,7 @@ public class BlockCropDevilsTrumpet extends BlockBush implements IGrowable {
         if (world.getBlock(x, y, z) != this) return;
 
         int meta = world.getBlockMetadata(x, y, z);
-        if (meta == META_BUD) {
+        if (meta == META_BUD || canGrowDown(world, x, y, z)) {
             if (random.nextInt(GROWTH_CHANCE) == 0 && isNearPortal(world, x, y, z)) {
                 grow(world, x, y, z);
             }
@@ -130,6 +126,18 @@ public class BlockCropDevilsTrumpet extends BlockBush implements IGrowable {
     }
 
     /**
+     * The hit box follows the texture. */
+    @Override
+    public void setBlockBoundsBasedOnState(IBlockAccess world, int x, int y, int z) {
+        int meta = world.getBlockMetadata(x, y, z);
+        float bottom = 0.0f;
+        if (meta == META_BUD) bottom = 7.0f / 16.0f;
+        else if (meta == META_BUD_MATURE) bottom = 3.0f / 16.0f;
+        else if (meta == META_FLOWER) bottom = 1.0f / 16.0f;
+        setBlockBounds(0.25f, bottom, 0.25f, 0.75f, 1.0f, 0.75f);
+    }
+
+    /**
      * An open flower glows faintly.
      */
     @Override
@@ -138,7 +146,7 @@ public class BlockCropDevilsTrumpet extends BlockBush implements IGrowable {
     }
 
     /**
-     * Helper function; changes the metadata and recalculates block light, which setBlockMetadataWithNotify doesn't do.
+     * Helper function; changes the metadata and recalculates block light.
      */
     private static void setMetaAndRelight(World world, int x, int y, int z, int meta) {
         world.setBlockMetadataWithNotify(x, y, z, meta, 2);
@@ -153,8 +161,6 @@ public class BlockCropDevilsTrumpet extends BlockBush implements IGrowable {
     public void randomDisplayTick(World world, int x, int y, int z, Random rand) {
         if (world.getBlockMetadata(x, y, z) != META_FLOWER || rand.nextInt(PARTICLE_CHANCE) != 0) return;
 
-        // A portal particle starts 1 block above the given position (plus the "motion" offset) and drifts to it over
-        // about 2 seconds. Aiming it 1 block below the flower makes it start at the flower and sink.
         double px = x + 0.3 + rand.nextDouble() * 0.4;
         double py = y - 0.6 + rand.nextDouble() * 0.3;
         double pz = z + 0.3 + rand.nextDouble() * 0.4;
@@ -186,15 +192,15 @@ public class BlockCropDevilsTrumpet extends BlockBush implements IGrowable {
 
     /**
      * Can bone meal be used here at all? If false, the bone meal isn't used up.
-     * Only a young bud, near a portal.
      */
     @Override
     public boolean func_149851_a(World world, int x, int y, int z, boolean isClient) {
-        return world.getBlockMetadata(x, y, z) == META_BUD && isNearPortal(world, x, y, z);
+        return (world.getBlockMetadata(x, y, z) == META_BUD || canGrowDown(world, x, y, z))
+            && isNearPortal(world, x, y, z);
     }
 
     /**
-     * Does this use succeed? The bone meal is used up either way (server only).
+     * Does this use succeed? The bone meal is used up either way.
      */
     @Override
     public boolean func_149852_a(World world, Random random, int x, int y, int z) {
@@ -202,7 +208,7 @@ public class BlockCropDevilsTrumpet extends BlockBush implements IGrowable {
     }
 
     /**
-     * Applies the growth, if func_149852_a returned true (server only).
+     * Effect of bone meal growth.
      */
     @Override
     public void func_149853_b(World world, Random random, int x, int y, int z) {
@@ -210,13 +216,13 @@ public class BlockCropDevilsTrumpet extends BlockBush implements IGrowable {
     }
 
     /**
-     * Helper function; one growth step for a bud: grow the column down if there's room, otherwise mature.
+     * Helper function; one growth step.
      */
     public void grow(World world, int x, int y, int z) {
-        if (canGrowDown(world, x, y, z)) {
-            growDown(world, x, y, z);
-        } else {
+        if (world.getBlockMetadata(x, y, z) == META_BUD) {
             world.setBlockMetadataWithNotify(x, y, z, META_BUD_MATURE, 2);
+        } else if (canGrowDown(world, x, y, z)) {
+            growDown(world, x, y, z);
         }
     }
 
@@ -232,10 +238,10 @@ public class BlockCropDevilsTrumpet extends BlockBush implements IGrowable {
     }
 
     /**
-     * Helper function; checks that this is a bud with air below and the column isn't at its full length yet.
+     * Helper function; checks that this is a mature bud with air below and the column isn't at its full length yet.
      */
     public boolean canGrowDown(World world, int x, int y, int z) {
-        return world.getBlockMetadata(x, y, z) == META_BUD && world.isAirBlock(x, y - 1, z)
+        return world.getBlockMetadata(x, y, z) == META_BUD_MATURE && world.isAirBlock(x, y - 1, z)
             && getColumnLength(world, x, y, z) < MAX_LENGTH;
     }
 
